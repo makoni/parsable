@@ -28,51 +28,26 @@ Example struct should conform to Codable and Parseable protocols:
 #import Parsable
 
 // Example struct that conforms to Codable protocol
-struct SampleErrorModel: Codable {	
+struct SampleErrorModel: Codable {
 	var error: String?
 	var code: Int?
-	
-	enum CodingKeys: String, CodingKey {
-		case error
-		case code
-	}
-	
-	init(error: String?, code: Int?) {
-		self.error = error
-		self.code = code
-	}
 }
-
 
 // Parseable protocol conformance. That's it.
 extension SampleErrorModel: Parseable {
 	typealias ParseableType = Self
 }
-
-
-extension SampleErrorModel {
-	init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		
-		let error = try container.decodeIfPresent(String.self, forKey: .error)
-		let code = try container.decodeIfPresent(Int.self, forKey: .code)
-		
-		self.init(error: error, code: code)
-	}
-}
-```
-
-Decode JSON -> model:
-
-```swift
-let jsonString = "{\"error\":\"error message text\",\"code\":200}"
-let data = jsonString.data(using: .utf8)
-let decodedData = SampleErrorModel.decodeFromData(data: data!)
 ```
 
 Encode model -> JSON:
 
 ```swift
-let error = SampleErrorModel(error: "error message text", code: 404)
-let encodedData = SampleErrorModel.encode(fromEncodable: error)
+let sampleModel = SampleErrorModel(error: "error message text", code: 404)
+let jsonData = SampleErrorModel.encode(fromEncodable: sampleModel)
+```
+
+Decode JSON -> model:
+
+```swift
+let decodedModel = SampleErrorModel.decodeFromData(data: jsonData)
 ```
