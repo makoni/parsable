@@ -25,6 +25,8 @@ dependencies: [
 Example struct:
 
 ```swift
+#import Parsable
+
 // Example struct. Also for unit tests
 struct SampleErrorModel: Codable, Parseable {
 	typealias ParseableType = SampleErrorModel
