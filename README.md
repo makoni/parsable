@@ -1,6 +1,6 @@
 # Parsable
 
-Synax sugar that makes JSON decoding more elegant.
+Syntax sugar that makes JSON decoding more elegant.
 
 [![Swift 5](https://img.shields.io/badge/swift-5.1-orange.svg?style=flat)](http://swift.org) [![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-4BC51D.svg?style=flat)](https://swift.org/package-manager/)
 
