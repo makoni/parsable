@@ -9,9 +9,7 @@ import Foundation
 
 
 // Example struct. Also for unit tests
-struct SampleErrorModel: Codable, Parseable {
-	typealias ParseableType = SampleErrorModel
-	
+struct SampleErrorModel: Codable {
 	var error: String?
 	var code: Int?
 	
@@ -24,6 +22,11 @@ struct SampleErrorModel: Codable, Parseable {
 		self.error = error
 		self.code = code
 	}
+}
+
+
+extension SampleErrorModel: Parseable {
+	typealias ParseableType = Self
 }
 
 

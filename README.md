@@ -22,15 +22,13 @@ dependencies: [
 ## Usage
 
 
-Example struct should define typealias ParseableType from Parseable protocol:
+Example struct should conform to Codable and Parseable protocols:
 
 ```swift
 #import Parsable
 
-// Example struct. Also for unit tests
-struct SampleErrorModel: Codable, Parseable {
-	typealias ParseableType = SampleErrorModel
-	
+// Example struct that conforms to Codable protocol
+struct SampleErrorModel: Codable {	
 	var error: String?
 	var code: Int?
 	
@@ -43,6 +41,12 @@ struct SampleErrorModel: Codable, Parseable {
 		self.error = error
 		self.code = code
 	}
+}
+
+
+// Parseable protocol conformance. Thats it.
+extension SampleErrorModel: Parseable {
+	typealias ParseableType = Self
 }
 
 
