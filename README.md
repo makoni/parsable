@@ -44,7 +44,7 @@ struct SampleErrorModel: Codable {
 }
 
 
-// Parseable protocol conformance. Thats it.
+// Parseable protocol conformance. That's it.
 extension SampleErrorModel: Parseable {
 	typealias ParseableType = Self
 }
