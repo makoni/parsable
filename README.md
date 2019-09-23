@@ -22,7 +22,7 @@ dependencies: [
 ## Usage
 
 
-Example struct:
+Example struct should define typealias ParseableType from Parseable protocol:
 
 ```swift
 #import Parsable
