@@ -21,10 +21,18 @@ public protocol Parseable {
 	/// - Returns: Parsed object/scruct of assosiated type
 	static func decodeFromData(data: Data) -> ParseableType?
 	
+	/// Decode JSON to Parsable model
+	/// - Parameters:
+	///   - data: JSON data
+	///   - dateDecodingStrategy: date decoding strategy
+	static func decodeFromData(data: Data, withDateDecodingStrategy: JSONDecoder.DateDecodingStrategy) -> ParseableType?
+	
 	/// Encode self to string
 	///
 	/// - Returns: Data
 	static func encode(fromEncodable encodable: ParseableType) -> Data?
+	
+	static func encode(fromEncodable encodable: ParseableType, withDateEncodingStrategy: JSONEncoder.DateEncodingStrategy) -> Data?
 }
 
 
@@ -52,8 +60,16 @@ extension Parseable {
 	/// Decode JSON to Parsable model
 	/// - Parameter data: JSON data
 	public static func decodeFromData(data: Data) -> ParseableType? {
+		return decodeFromData(data: data, withDateDecodingStrategy: .secondsSince1970)
+	}
+	
+	/// Decode JSON to Parsable model
+	/// - Parameters:
+	///   - data: JSON data
+	///   - dateDecodingStrategy: date decoding strategy
+	public static func decodeFromData(data: Data, withDateDecodingStrategy dateDecodingStrategy: JSONDecoder.DateDecodingStrategy) -> ParseableType? {
 		let decoder = JSONDecoder()
-		decoder.dateDecodingStrategy = .secondsSince1970
+		decoder.dateDecodingStrategy = dateDecodingStrategy
 		
 		var decodedData: ParseableType?
 		
@@ -70,7 +86,16 @@ extension Parseable {
 	/// Encode Parsable model to Data
 	/// - Parameter encodable: model
 	public static func encode(fromEncodable encodable: ParseableType) -> Data? {
+		return encode(fromEncodable: encodable, withDateEncodingStrategy: .secondsSince1970)
+	}
+	
+	/// Encode Parsable model to Data
+	/// - Parameters:
+	///   - encodable: model
+	///   - dateEncodingStrategy: date encoding strategy
+	public static func encode(fromEncodable encodable: ParseableType, withDateEncodingStrategy dateEncodingStrategy: JSONEncoder.DateEncodingStrategy) -> Data? {
 		let encoder = JSONEncoder()
+		encoder.dateEncodingStrategy = dateEncodingStrategy
 		var encodedData: Data
 		do {
 			encodedData = try encoder.encode(encodable)

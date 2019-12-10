@@ -12,6 +12,7 @@ import Foundation
 struct SampleErrorModel: Codable {
 	var error: String?
 	var code: Int?
+	var date: Date?
 }
 
 extension SampleErrorModel: Parseable {
