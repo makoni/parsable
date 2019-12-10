@@ -44,10 +44,14 @@ Encode model -> JSON:
 ```swift
 let sampleModel = SampleErrorModel(error: "error message text", code: 404)
 let jsonData = SampleErrorModel.encode(fromEncodable: sampleModel)
+// or
+let jsonData = SampleErrorModel.encode(fromEncodable: error, withDateEncodingStrategy: .millisecondsSince1970)
 ```
 
 Decode JSON -> model:
 
 ```swift
 let decodedModel = SampleErrorModel.decodeFromData(data: jsonData)
+// or
+let decodedModel = SampleErrorModel.decodeFromData(data: jsonData, withDateDecodingStrategy: .millisecondsSince1970)
 ```
