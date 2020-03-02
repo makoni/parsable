@@ -27,23 +27,29 @@ final class ParsableTests: XCTestCase {
 	}
 	
 	func testEncode() {
-		let error = SampleErrorModel(
-			error: "error message text",
-			code: 404,
-			date: Date(timeIntervalSince1970: TimeInterval(1575981667.984))
-		)
-		let expectedJSONString = "{\"error\":\"error message text\",\"date\":1575981667984,\"code\":404}"
+		let expectedDate = Date(timeIntervalSince1970: TimeInterval(1575981667.984))
+		let exmectedMessage = "error message text"
 		
+		let error = SampleErrorModel(
+			error: exmectedMessage,
+			code: 404,
+			date: expectedDate
+		)
 		let encodedData = SampleErrorModel.encode(fromEncodable: error, withDateEncodingStrategy: .millisecondsSince1970)
-		let dataString = String(data: encodedData!, encoding: .utf8)
 		
 		XCTAssertNotNil(encodedData, "data should not be nil")
-		XCTAssertEqual(dataString, expectedJSONString, "Error message should be equal")
+		
+		let decodedModel = SampleErrorModel.decodeFromData(data: encodedData!, withDateDecodingStrategy: .millisecondsSince1970)
+		
+		
+		XCTAssertEqual(decodedModel!.date, expectedDate, "Dates should be equal")
+		XCTAssertEqual(decodedModel!.error, exmectedMessage, "Messages should be equal")
+		XCTAssertEqual(decodedModel!.code, 404, "Codes should be equal")
 	}
 	
 	static var allTests = [
         ("testDecode_validJSON", testDecode_validJSON),
 		("testDecode_invalidJSON", testDecode_invalidJSON),
-		("testEncode", testEncode),
+		("testEncode", testEncode)
     ]
 }
