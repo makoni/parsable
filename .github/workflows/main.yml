@@ -19,3 +19,18 @@ jobs:
             
     - name: Done
       run: echo Done
+      
+  macos:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    
+    - name: Test
+      run: swift test --enable-test-discovery --sanitize=thread
+      
+    - name: Swift build
+      run: swift build -c release
+            
+    - name: Done
+      run: echo Done
