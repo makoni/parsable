@@ -11,12 +11,12 @@ jobs:
     - name: Checkout
       uses: actions/checkout@master
     
-    - name: Test
-      run: swift test --enable-test-discovery --sanitize=thread
-      
     - name: Swift build
       run: swift build -c release
-            
+      
+    - name: Test
+      run: swift test --enable-test-discovery --sanitize=thread
+       
     - name: Done
       run: echo Done
       
@@ -32,5 +32,5 @@ jobs:
     - name: Swift build
       run: swift build -c release
             
-    - name: Done
-      run: echo Done
+    - name: Print Swift version
+      run: swift --version
