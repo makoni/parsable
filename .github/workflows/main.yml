@@ -5,7 +5,7 @@ on: [push]
 jobs:
   ubuntu:
     container: 
-      image: vapor/swift:5.2-bionic
+      image: swift:latest
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
