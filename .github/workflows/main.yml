@@ -16,9 +16,6 @@ jobs:
       
     - name: Test
       run: swift test --enable-test-discovery --sanitize=thread
-      
-    - name: Create XCFramework
-      uses: unsignedapps/swift-create-xcframework@v2
        
     - name: Done
       run: echo Done
