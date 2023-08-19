@@ -2,7 +2,7 @@
 
 Syntax sugar that makes JSON decoding more elegant.
 
-[![Swift 5](https://img.shields.io/badge/swift-5.5-orange.svg?style=flat)](http://swift.org) [![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-4BC51D.svg?style=flat)](https://swift.org/package-manager/) [![Build and test](https://github.com/makoni/parsable/actions/workflows/main.yml/badge.svg)](https://github.com/makoni/parsable/actions/workflows/main.yml)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmakoni%2Fparsable%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/makoni/parsable) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmakoni%2Fparsable%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/makoni/parsable) [![Build and test](https://github.com/makoni/parsable/actions/workflows/main.yml/badge.svg)](https://github.com/makoni/parsable/actions/workflows/main.yml)
 
 
 ## Installation
