@@ -11,18 +11,15 @@ Syntax sugar that makes JSON decoding more elegant.
 
 Add to the `dependencies` value of your `Package.swift`.
 
-#### Swift 5
-
 ```swift
 dependencies: [
-	.package(url: "https://github.com/makoni/parsable.git", from: "1.0.0"),
+    .package(url: "https://github.com/makoni/parsable.git", from: "1.0.0"),
 ]
 ```
 
 ## Usage
 
-
-Example struct should conform to Codable and Parseable protocols:
+An example struct or class should conform to Codable and Parseable protocols:
 
 ```swift
 #import Parsable
@@ -37,21 +34,30 @@ struct SampleErrorModel: Codable {
 extension SampleErrorModel: Parseable {
     typealias ParseableType = Self
 }
-```
 
-Encode model -> JSON:
-
-```swift
 let sampleModel = SampleErrorModel(error: "error message text", code: 404)
-let jsonData = SampleErrorModel.encode(fromEncodable: sampleModel)
-// or
-let jsonData = SampleErrorModel.encode(fromEncodable: error, withDateEncodingStrategy: .millisecondsSince1970)
 ```
 
-Decode JSON -> model:
+Struct -> JSON data:
 
 ```swift
+let jsonData = SampleErrorModel.encode(
+    fromEncodable: error, 
+    withDateEncodingStrategy: .millisecondsSince1970
+)
+```
+
+JSON data -> struct:
+
+```swift
+let decodedModel = SampleErrorModel.decodeFromData(
+    data: jsonData,
+    withDateDecodingStrategy: .millisecondsSince1970
+)
+```
+
+Date decoding strategy is optional. Default value is:
+```swift
+let jsonData = SampleErrorModel.encode(fromEncodable: sampleModel)
 let decodedModel = SampleErrorModel.decodeFromData(data: jsonData)
-// or
-let decodedModel = SampleErrorModel.decodeFromData(data: jsonData, withDateDecodingStrategy: .millisecondsSince1970)
 ```
