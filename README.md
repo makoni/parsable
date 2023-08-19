@@ -61,3 +61,5 @@ Date decoding strategy is optional. Default value is:
 let jsonData = SampleErrorModel.encode(fromEncodable: sampleModel)
 let decodedModel = SampleErrorModel.decodeFromData(data: jsonData)
 ```
+
+Here's some [documentation](https://spaceinbox.me/docs/parsable/documentation/parsable/).
