@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import Parsable
 
 // Example struct. Also for unit tests
 struct SampleErrorModel: Codable {
