@@ -29,13 +29,13 @@ Example struct should conform to Codable and Parseable protocols:
 
 // Example struct that conforms to Codable protocol
 struct SampleErrorModel: Codable {
-	var error: String?
-	var code: Int?
+    var error: String?
+    var code: Int?
 }
 
 // Parseable protocol conformance. That's it.
 extension SampleErrorModel: Parseable {
-	typealias ParseableType = Self
+    typealias ParseableType = Self
 }
 ```
 
