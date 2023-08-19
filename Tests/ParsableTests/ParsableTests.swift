@@ -18,7 +18,7 @@ final class ParsableTests: XCTestCase {
 		
 		XCTAssertEqual(decodedData?.date?.timeIntervalSince1970, 1575981667984 / 1000, "code should be equal to expected")
 	}
-	
+
 	func testDecode_invalidJSON() {
 		let errorData = "\"message\":\"error message text\"}"
 		let decodedData = SampleErrorModel.decodeFromData(data: errorData.data(using: .utf8)!)
@@ -46,10 +46,4 @@ final class ParsableTests: XCTestCase {
 		XCTAssertEqual(decodedModel!.error, exmectedMessage, "Messages should be equal")
 		XCTAssertEqual(decodedModel!.code, 404, "Codes should be equal")
 	}
-	
-	static var allTests = [
-        ("testDecode_validJSON", testDecode_validJSON),
-		("testDecode_invalidJSON", testDecode_invalidJSON),
-		("testEncode", testEncode)
-    ]
 }

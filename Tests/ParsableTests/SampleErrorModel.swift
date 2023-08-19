@@ -8,7 +8,7 @@
 import Foundation
 import Parsable
 
-// Example struct. Also for unit tests
+// Example struct
 struct SampleErrorModel: Codable {
 	var error: String?
 	var code: Int?

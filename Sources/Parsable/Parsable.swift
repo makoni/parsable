@@ -14,24 +14,19 @@ public protocol Parseable {
 	
 	// MARK: - Assissiated type for codable type
 	associatedtype ParseableType: Codable
-	
-	/// Decode from data
-	///
-	/// - Parameter data: data
-	/// - Returns: Parsed object/scruct of assosiated type
-	static func decodeFromData(data: Data) -> ParseableType?
-	
-	/// Decode JSON to Parsable model
+
+	/// Decode JSON to Parsable model.
 	/// - Parameters:
-	///   - data: JSON data
-	///   - dateDecodingStrategy: date decoding strategy
+	///   - data: JSON data.
+	///   - withDateDecodingStrategy: Date decoding strategy.
+	/// - Returns: Parsed object/scruct of assosiated type.
 	static func decodeFromData(data: Data, withDateDecodingStrategy: JSONDecoder.DateDecodingStrategy) -> ParseableType?
-	
-	/// Encode self to string
-	///
-	/// - Returns: Data
-	static func encode(fromEncodable encodable: ParseableType) -> Data?
-	
+
+	/// Encode self to JSON data.
+	/// - Parameters:
+	///   - encodable: Model type.
+	///   - withDateEncodingStrategy: Date encoding strategy.
+	/// - Returns: JSON Data.
 	static func encode(fromEncodable encodable: ParseableType, withDateEncodingStrategy: JSONEncoder.DateEncodingStrategy) -> Data?
 }
 
@@ -55,19 +50,12 @@ extension Parseable {
 		}
 		#endif
 	}
-
-	
-	/// Decode JSON to Parsable model
-	/// - Parameter data: JSON data
-	public static func decodeFromData(data: Data) -> ParseableType? {
-		return decodeFromData(data: data, withDateDecodingStrategy: .secondsSince1970)
-	}
 	
 	/// Decode JSON to Parsable model
 	/// - Parameters:
-	///   - data: JSON data
-	///   - dateDecodingStrategy: date decoding strategy
-	public static func decodeFromData(data: Data, withDateDecodingStrategy dateDecodingStrategy: JSONDecoder.DateDecodingStrategy) -> ParseableType? {
+	///   - data: JSON data.
+	///   - dateDecodingStrategy: Date decoding strategy.
+	public static func decodeFromData(data: Data, withDateDecodingStrategy dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .secondsSince1970) -> ParseableType? {
 		let decoder = JSONDecoder()
 		decoder.dateDecodingStrategy = dateDecodingStrategy
 		
@@ -82,18 +70,12 @@ extension Parseable {
 		
 		return decodedData
 	}
-	
-	/// Encode Parsable model to Data
-	/// - Parameter encodable: model
-	public static func encode(fromEncodable encodable: ParseableType) -> Data? {
-		return encode(fromEncodable: encodable, withDateEncodingStrategy: .secondsSince1970)
-	}
-	
+
 	/// Encode Parsable model to Data
 	/// - Parameters:
-	///   - encodable: model
-	///   - dateEncodingStrategy: date encoding strategy
-	public static func encode(fromEncodable encodable: ParseableType, withDateEncodingStrategy dateEncodingStrategy: JSONEncoder.DateEncodingStrategy) -> Data? {
+	///   - encodable: Data model.
+	///   - dateEncodingStrategy: Date encoding strategy.
+	public static func encode(fromEncodable encodable: ParseableType, withDateEncodingStrategy dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .secondsSince1970) -> Data? {
 		let encoder = JSONEncoder()
 		encoder.dateEncodingStrategy = dateEncodingStrategy
 		var encodedData: Data
