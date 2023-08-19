@@ -12,6 +12,9 @@ let package = Package(
             targets: ["Parsable"]
 		)
     ],
+	dependencies: [
+		.package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
+	],
     targets: [
         .target(name: "Parsable"),
         .testTarget(name: "ParsableTests", dependencies: ["Parsable"])
