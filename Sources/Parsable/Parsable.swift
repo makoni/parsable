@@ -34,13 +34,15 @@ public protocol Parseable {
 // MARK: - Default protocol implementation
 extension Parseable {
 	
-	/// Debug log function with printing filename, method and line number
+	/// Prints a debug log message to the console, including filename, method name, and line number.
+	///
+	/// This function is only enabled in debug builds (`#if DEBUG`).
 	///
 	/// - Parameters:
-	///   - messages: arguments
-	///   - fullPath: filepath
-	///   - line: line number
-	///   - functionName: function/method name
+	///   - messages: The items to be printed. These can be any type that can be converted to a string.
+	///   - file: The full path to the source file where the log is being made. Defaults to the current file (`#file`).
+	///   - line: The line number in the source file where the log is being made. Defaults to the current line (`#line`).
+	///   - functionName: The name of the function or method where the log is being made. Defaults to the current function/method (`#function`).
 	private static func DLog(_ messages: Any..., fullPath: String = #file, line: Int = #line, functionName: String = #function) {
 		#if DEBUG
 		let file = URL(fileURLWithPath: fullPath)
@@ -51,10 +53,17 @@ extension Parseable {
 		#endif
 	}
 	
-	/// Decode JSON to Parsable model
+	/// Decodes JSON data into a Swift model object that conforms to the `Parsable` protocol.
+	///
+	/// This function attempts to decode the provided JSON data into an instance of the `ParseableType`.
+	/// If the decoding is successful, the parsed model object is returned. Otherwise, `nil` is returned
+	/// and an error message is logged using the `DLog` function (assuming it's defined).
+	///
 	/// - Parameters:
-	///   - data: JSON data.
-	///   - dateDecodingStrategy: Date decoding strategy.
+	///   - data: The JSON data to be decoded.
+	///   - dateDecodingStrategy: (Optional) The strategy for decoding dates in the JSON.
+	///     Defaults to `.secondsSince1970` (number of seconds since 1970).
+	/// - Returns: An instance of the `ParseableType` if the decoding is successful, otherwise `nil`.
 	public static func decodeFromData(data: Data, withDateDecodingStrategy dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .secondsSince1970) -> ParseableType? {
 		let decoder = JSONDecoder()
 		decoder.dateDecodingStrategy = dateDecodingStrategy
@@ -71,10 +80,17 @@ extension Parseable {
 		return decodedData
 	}
 
-	/// Encode Parsable model to Data
+	/// Encodes a Swift model object that conforms to the `Parsable` protocol into JSON data.
+	///
+	/// This function attempts to encode the provided model object (`encodable`) into JSON data.
+	/// If the encoding is successful, the encoded data is returned. Otherwise, `nil` is returned
+	/// and an error message is logged using the `DLog` function (assuming it's defined).
+	///
 	/// - Parameters:
-	///   - encodable: Data model.
-	///   - dateEncodingStrategy: Date encoding strategy.
+	///   - encodable: The model object to be encoded. It must conform to the `Parseable` protocol.
+	///   - dateEncodingStrategy: (Optional) The strategy for encoding dates in the JSON.
+	///     Defaults to `.secondsSince1970` (number of seconds since 1970).
+	/// - Returns: The encoded JSON data if successful, otherwise `nil`.
 	public static func encode(fromEncodable encodable: ParseableType, withDateEncodingStrategy dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .secondsSince1970) -> Data? {
 		let encoder = JSONEncoder()
 		encoder.dateEncodingStrategy = dateEncodingStrategy
