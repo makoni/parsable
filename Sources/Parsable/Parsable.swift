@@ -61,8 +61,7 @@ extension Parseable {
 	///
 	/// - Parameters:
 	///   - data: The JSON data to be decoded.
-	///   - dateDecodingStrategy: (Optional) The strategy for decoding dates in the JSON.
-	///     Defaults to `.secondsSince1970` (number of seconds since 1970).
+	///   - dateDecodingStrategy: (Optional) The strategy for decoding dates in the JSON. Defaults to `.secondsSince1970` (number of seconds since 1970).
 	/// - Returns: An instance of the `ParseableType` if the decoding is successful, otherwise `nil`.
 	public static func decodeFromData(data: Data, withDateDecodingStrategy dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .secondsSince1970) -> ParseableType? {
 		let decoder = JSONDecoder()
@@ -88,8 +87,7 @@ extension Parseable {
 	///
 	/// - Parameters:
 	///   - encodable: The model object to be encoded. It must conform to the `Parseable` protocol.
-	///   - dateEncodingStrategy: (Optional) The strategy for encoding dates in the JSON.
-	///     Defaults to `.secondsSince1970` (number of seconds since 1970).
+	///   - dateEncodingStrategy: (Optional) The strategy for encoding dates in the JSON. Defaults to `.secondsSince1970` (number of seconds since 1970).
 	/// - Returns: The encoded JSON data if successful, otherwise `nil`.
 	public static func encode(fromEncodable encodable: ParseableType, withDateEncodingStrategy dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .secondsSince1970) -> Data? {
 		let encoder = JSONEncoder()
