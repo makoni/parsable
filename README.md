@@ -35,7 +35,7 @@ The provided code includes a private static function `DLog` for debug logging. T
 ```swift
 #import Parsable
 
-// Define a model conforming to Parseable
+// Define a model conforming to Codable
 struct SampleErrorModel: Codable {
     var error: String
     var code: Int
