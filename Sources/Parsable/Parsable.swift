@@ -15,18 +15,28 @@ public protocol Parseable {
 	// MARK: - Assissiated type for codable type
 	associatedtype ParseableType: Codable
 
-	/// Decode JSON to Parsable model.
+	/// Decodes JSON data into a Swift model object that conforms to the `Parsable` protocol.
+	///
+	/// This function attempts to decode the provided JSON data into an instance of the `ParseableType`.
+	/// If the decoding is successful, the parsed model object is returned. Otherwise, `nil` is returned
+	/// and an error message is logged using the `DLog` function (assuming it's defined).
+	///
 	/// - Parameters:
-	///   - data: JSON data.
-	///   - withDateDecodingStrategy: Date decoding strategy.
-	/// - Returns: Parsed object/scruct of assosiated type.
+	///   - data: The JSON data to be decoded.
+	///   - dateDecodingStrategy: (Optional) The strategy for decoding dates in the JSON. Defaults to `.secondsSince1970` (number of seconds since 1970).
+	/// - Returns: An instance of the `ParseableType` if the decoding is successful, otherwise `nil`.
 	static func decodeFromData(data: Data, withDateDecodingStrategy: JSONDecoder.DateDecodingStrategy) -> ParseableType?
 
-	/// Encode self to JSON data.
+	/// Encodes a Swift model object that conforms to the `Parsable` protocol into JSON data.
+	///
+	/// This function attempts to encode the provided model object (`encodable`) into JSON data.
+	/// If the encoding is successful, the encoded data is returned. Otherwise, `nil` is returned
+	/// and an error message is logged using the `DLog` function (assuming it's defined).
+	///
 	/// - Parameters:
-	///   - encodable: Model type.
-	///   - withDateEncodingStrategy: Date encoding strategy.
-	/// - Returns: JSON Data.
+	///   - encodable: The model object to be encoded. It must conform to the `Parseable` protocol.
+	///   - dateEncodingStrategy: (Optional) The strategy for encoding dates in the JSON. Defaults to `.secondsSince1970` (number of seconds since 1970).
+	/// - Returns: The encoded JSON data if successful, otherwise `nil`.
 	static func encode(fromEncodable encodable: ParseableType, withDateEncodingStrategy: JSONEncoder.DateEncodingStrategy) -> Data?
 }
 
