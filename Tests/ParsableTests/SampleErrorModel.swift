@@ -8,13 +8,13 @@
 import Foundation
 import Parsable
 
-// Example struct
-struct SampleErrorModel: Codable {
+struct SampleErrorModel: Codable, Parseable {
 	var error: String?
 	var code: Int?
 	var date: Date?
 }
 
-extension SampleErrorModel: Parseable {
-	typealias ParseableType = Self
+struct SnakeCaseModel: Codable, Parseable {
+	var errorMessage: String
+	var statusCode: Int
 }

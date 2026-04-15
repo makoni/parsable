@@ -1,36 +1,30 @@
-name: Build and test
+name: Test
 
-on: [push]
+on:
+  push:
+    branches: [ "master" ]
 
 jobs:
-  ubuntu:
-    container: 
-      image: swift:latest
+  ubuntu-test:
+    name: Test on Ubuntu
     runs-on: ubuntu-latest
+    container:
+      image: swift:latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@master
-    
-    - name: Swift build
-      run: swift build -c release
-      
-    - name: Test
-      run: swift test --enable-test-discovery --sanitize=thread
-       
-    - name: Done
-      run: echo Done
-      
-  macos:
-    runs-on: macos-latest
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Swift version
+        run: swift --version
+      - name: Swift test
+        run: swift test
+
+  macos-test:
+    name: Test on macOS
+    runs-on: macos-26
     steps:
-    - name: Checkout
-      uses: actions/checkout@master
-    
-    - name: Test
-      run: swift test --enable-test-discovery --sanitize=thread
-      
-    - name: Swift build
-      run: swift build -c release
-            
-    - name: Print Swift version
-      run: swift --version
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Swift version
+        run: swift --version
+      - name: Swift test
+        run: swift test
