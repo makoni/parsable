@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import Parsable
 
-@Suite("Parsable")
+@Suite("Parsable", .serialized)
 struct ParsableTests {
 	@Test("Decodes valid JSON with a custom date strategy")
 	func decodeWithCustomDateStrategy() throws {
@@ -66,6 +66,31 @@ struct ParsableTests {
 
 		#expect(jsonObject["error_message"] as? String == "error message text")
 		#expect(jsonObject["status_code"] as? Int == 404)
+	}
+
+	@Test("Round-trips configured coders with snake case and milliseconds")
+	func roundTripsConfiguredCodersWithSnakeCaseAndMilliseconds() throws {
+		let jsonString = #"{"created_at":1575981667984,"status_code":202}"#
+		let decoder = JSONDecoder()
+		decoder.keyDecodingStrategy = .convertFromSnakeCase
+		decoder.dateDecodingStrategy = .millisecondsSince1970
+
+		let decodedModel = try SnakeCaseDateModel.decode(from: Data(jsonString.utf8), using: decoder)
+
+		#expect(decodedModel.createdAt == Date(timeIntervalSince1970: 1_575_981_667.984))
+		#expect(decodedModel.statusCode == 202)
+
+		let encoder = JSONEncoder()
+		encoder.keyEncodingStrategy = .convertToSnakeCase
+		encoder.dateEncodingStrategy = .millisecondsSince1970
+
+		let encodedData = try decodedModel.encoded(using: encoder)
+		let jsonObject = try #require(
+			JSONSerialization.jsonObject(with: encodedData) as? [String: Any]
+		)
+
+		#expect(jsonObject["created_at"] as? Double == 1_575_981_667_984)
+		#expect(jsonObject["status_code"] as? Int == 202)
 	}
 
 	@Test("Uses seconds since 1970 by default when decoding")
@@ -150,6 +175,45 @@ struct ParsableTests {
 		
 		#expect(encodedData == nil)
 	}
+
+	@Test("Compatibility helpers use a custom failure logger")
+	@available(*, deprecated)
+	func compatibilityHelpersUseCustomFailureLogger() {
+		let recorder = FailureRecorder()
+		let previousLogger = ParsableConfiguration.failureLogger
+		defer {
+			ParsableConfiguration.failureLogger = previousLogger
+		}
+
+		ParsableConfiguration.failureLogger = { error, context in
+			recorder.record(error: error, context: context)
+		}
+
+		_ = SampleErrorModel.decodeFromData(data: Data(#""message":"error message text"}"#.utf8))
+
+		#expect(recorder.recordedErrors.count == 1)
+		#expect(recorder.recordedErrors.first?.context.file == "Parsable.swift")
+		#expect(recorder.recordedErrors.first?.context.functionName == "decodeFromData(data:withDateDecodingStrategy:)")
+	}
+
+	@Test("Compatibility helper logging can be disabled")
+	@available(*, deprecated)
+	func compatibilityHelperLoggingCanBeDisabled() {
+		let recorder = FailureRecorder()
+		let previousLogger = ParsableConfiguration.failureLogger
+		defer {
+			ParsableConfiguration.failureLogger = previousLogger
+		}
+
+		ParsableConfiguration.failureLogger = { error, context in
+			recorder.record(error: error, context: context)
+		}
+		ParsableConfiguration.disableFailureLogging()
+
+		_ = FailingEncodableModel.encode(fromEncodable: FailingEncodableModel())
+
+		#expect(recorder.recordedErrors.isEmpty)
+	}
 }
 
 private enum ParseableTestError: Error {
@@ -173,5 +237,23 @@ private struct FailingEncodableModel: Codable, Parseable {
 	
 	func encode(to encoder: Encoder) throws {
 		throw ParseableTestError.expectedFailure
+	}
+}
+
+private final class FailureRecorder {
+	struct RecordedError {
+		let errorDescription: String
+		let context: ParsableFailureContext
+	}
+
+	private(set) var recordedErrors: [RecordedError] = []
+
+	func record(error: any Error, context: ParsableFailureContext) {
+		recordedErrors.append(
+			RecordedError(
+				errorDescription: error.localizedDescription,
+				context: context
+			)
+		)
 	}
 }

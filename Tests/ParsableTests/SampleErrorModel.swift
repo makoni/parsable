@@ -18,3 +18,8 @@ struct SnakeCaseModel: Codable, Parseable {
 	var errorMessage: String
 	var statusCode: Int
 }
+
+struct SnakeCaseDateModel: Codable, Parseable {
+	var createdAt: Date
+	var statusCode: Int
+}

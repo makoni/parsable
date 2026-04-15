@@ -11,6 +11,7 @@ Adopt ``Parseable`` on any `Codable` type to get:
 - Overloads that accept a date strategy
 - Overloads that accept a fully configured `JSONDecoder` or `JSONEncoder`
 - Compatibility helpers that return `nil` on failure
+- Configurable compatibility-helper logging
 
 Conformance is intentionally lightweight:
 
@@ -96,7 +97,20 @@ let encodedError = APIError.encode(
 )
 ```
 
-These helpers return `nil` on failure and emit a debug log in debug builds. Prefer the throwing APIs for new code when you want access to the underlying error.
+These helpers return `nil` on failure and forward errors to ``ParsableConfiguration/failureLogger`` when logging is enabled. Prefer the throwing APIs for new code when you want access to the underlying error.
+
+## Configure compatibility-helper logging
+
+Compatibility-helper logging is enabled by default. You can provide your own logger or disable it completely:
+
+```swift
+ParsableConfiguration.failureLogger = { error, context in
+    print("Parsable warning: \(context.file):\(context.line) \(error.localizedDescription)")
+}
+
+ParsableConfiguration.disableFailureLogging()
+ParsableConfiguration.enableDefaultFailureLogging()
+```
 
 ## Migration notes
 
@@ -106,6 +120,7 @@ If you were using an older version of the library:
 - Prefer ``Parseable/decode(from:)`` over ``Parseable/decodeFromData(data:withDateDecodingStrategy:)``
 - Prefer ``Parseable/encoded()`` over ``Parseable/encode(fromEncodable:withDateEncodingStrategy:)``
 - Use the `using:` overloads when you already have a configured decoder or encoder
+- Configure ``ParsableConfiguration/failureLogger`` if you want to customize or disable compatibility-helper logging
 
 ## Topics
 
@@ -116,5 +131,9 @@ If you were using an older version of the library:
 - ``Parseable/encoded()``
 - ``Parseable/encoded(dateEncodingStrategy:)``
 - ``Parseable/encoded(using:)``
+- ``ParsableConfiguration``
+- ``ParsableConfiguration/failureLogger``
+- ``ParsableConfiguration/enableDefaultFailureLogging()``
+- ``ParsableConfiguration/disableFailureLogging()``
 - ``Parseable/decodeFromData(data:withDateDecodingStrategy:)``
 - ``Parseable/encode(fromEncodable:withDateEncodingStrategy:)``

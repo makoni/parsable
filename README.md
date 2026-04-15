@@ -12,6 +12,7 @@
 - Provides primary throwing APIs for decoding and encoding
 - Supports configured `JSONDecoder` and `JSONEncoder` instances
 - Keeps the original nil-returning helpers for compatibility
+- Lets you configure or disable compatibility-helper logging
 
 ## Installation
 
@@ -100,7 +101,20 @@ let decodedModel = APIError.decodeFromData(data: jsonData)
 let encodedData = APIError.encode(fromEncodable: APIError(error: "Not Found", code: 404, date: .now))
 ```
 
-Those helpers log the failure in debug builds and return `nil`. Prefer the throwing APIs in new code when you need to inspect errors.
+Those helpers return `nil` and forward failures to `ParsableConfiguration.failureLogger` when logging is enabled. Prefer the throwing APIs in new code when you need to inspect errors.
+
+## Compatibility helper logging
+
+Deprecated compatibility helpers log failures through `ParsableConfiguration.failureLogger`, which is enabled by default.
+
+```swift
+ParsableConfiguration.failureLogger = { error, context in
+    print("Parsable warning: \(context.file):\(context.line) \(error.localizedDescription)")
+}
+
+ParsableConfiguration.disableFailureLogging()
+ParsableConfiguration.enableDefaultFailureLogging()
+```
 
 ## Documentation
 

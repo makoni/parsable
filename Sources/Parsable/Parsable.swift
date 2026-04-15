@@ -1,5 +1,69 @@
 import Foundation
 
+/// Additional context about a compatibility-helper failure.
+public struct ParsableFailureContext: Sendable {
+	/// The source filename where the failure was handled.
+	public let file: String
+
+	/// The source line where the failure was handled.
+	public let line: Int
+
+	/// The helper function that handled the failure.
+	public let functionName: String
+
+	/// Creates a new failure context value.
+	///
+	/// - Parameters:
+	///   - file: The source filename where the failure was handled.
+	///   - line: The source line where the failure was handled.
+	///   - functionName: The helper function that handled the failure.
+	public init(file: String, line: Int, functionName: String) {
+		self.file = file
+		self.line = line
+		self.functionName = functionName
+	}
+}
+
+/// Global configuration for `Parsable`.
+public enum ParsableConfiguration {
+	/// A closure that receives failures from deprecated compatibility helpers.
+	public typealias FailureLogger = (_ error: any Error, _ context: ParsableFailureContext) -> Void
+
+	private nonisolated(unsafe) static let defaultFailureLogger: FailureLogger = { error, context in
+		print("\(context.file):\(context.line) -> \(context.functionName): \(error.localizedDescription)")
+	}
+
+	private static let configurationLock = NSLock()
+	private nonisolated(unsafe) static var storedFailureLogger: FailureLogger? = defaultFailureLogger
+
+	/// The logger used by deprecated compatibility helpers.
+	///
+	/// Logging is enabled by default. Set this value to `nil` to disable logging completely,
+	/// or replace it with your own closure to redirect failures elsewhere.
+	public static var failureLogger: FailureLogger? {
+		get {
+			configurationLock.withLock {
+				storedFailureLogger
+			}
+		}
+		set {
+			configurationLock.withLock {
+				storedFailureLogger = newValue
+			}
+		}
+	}
+
+	/// Re-enables the built-in failure logger.
+	public static func enableDefaultFailureLogging() {
+		failureLogger = defaultFailureLogger
+	}
+
+	/// Disables failure logging for deprecated compatibility helpers.
+	public static func disableFailureLogging() {
+		failureLogger = nil
+	}
+}
+
 /// A marker protocol that adds convenient JSON encoding and decoding helpers to `Codable` models.
 ///
 /// Conforming types only need to adopt `Parseable`; the default implementation provides both
@@ -14,10 +78,9 @@ extension Parseable {
 		line: Int = #line,
 		functionName: String = #function
 	) {
-		#if DEBUG
 		let filename = URL(fileURLWithPath: fullPath).lastPathComponent
-		print("\(filename):\(line) -> \(functionName): \(error.localizedDescription)")
-		#endif
+		let context = ParsableFailureContext(file: filename, line: line, functionName: functionName)
+		ParsableConfiguration.failureLogger?(error, context)
 	}
 
 	/// Decodes a model from JSON data using the default `.secondsSince1970` date strategy.
@@ -88,7 +151,8 @@ extension Parseable {
 	///
 	/// This compatibility helper preserves the original API shape. Prefer the throwing
 	/// ``decode(from:)``, ``decode(from:dateDecodingStrategy:)``, or ``decode(from:using:)``
-	/// overloads in new code when you need access to the underlying error.
+	/// overloads in new code when you need access to the underlying error. Failures are
+	/// forwarded to ``ParsableConfiguration/failureLogger`` when logging is enabled.
 	///
 	/// - Parameters:
 	///   - data: The JSON data to decode.
@@ -115,7 +179,8 @@ extension Parseable {
 	///
 	/// This compatibility helper preserves the original API shape. Prefer ``encoded()``,
 	/// ``encoded(dateEncodingStrategy:)``, or ``encoded(using:)`` in new code when you need
-	/// access to the underlying error.
+	/// access to the underlying error. Failures are forwarded to
+	/// ``ParsableConfiguration/failureLogger`` when logging is enabled.
 	///
 	/// - Parameters:
 	///   - encodable: The model to encode.
@@ -136,5 +201,13 @@ extension Parseable {
 			logFailure(error)
 			return nil
 		}
+	}
+}
+
+private extension NSLock {
+	func withLock<T>(_ body: () throws -> T) rethrows -> T {
+		lock()
+		defer { unlock() }
+		return try body()
 	}
 }
