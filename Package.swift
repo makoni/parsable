@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -13,7 +13,7 @@ let package = Package(
 		)
     ],
 	dependencies: [
-		.package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
+		.package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.5")
 	],
     targets: [
         .target(name: "Parsable"),
