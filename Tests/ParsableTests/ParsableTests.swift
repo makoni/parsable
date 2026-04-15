@@ -1,49 +1,128 @@
-import XCTest
+import Foundation
+import Testing
 @testable import Parsable
 
-
-final class ParsableTests: XCTestCase {
-    func testDecode_validJSON() {
-		let jsonString = "{\"error\":\"error message text\",\"code\":200,\"date\":1575981667984}"
+@Suite("Parsable")
+struct ParsableTests {
+	@Test("Decodes valid JSON with a custom date strategy")
+	func decodeValidJSON() throws {
+		let jsonString = #"{"error":"error message text","code":200,"date":1575981667984}"#
 		let expectedMessageValue = "error message text"
 		let expectedCode = 200
 		
-		let data = jsonString.data(using: .utf8)
-		let decodedData = SampleErrorModel.decodeFromData(data: data!, withDateDecodingStrategy: .millisecondsSince1970)
+		let decodedData = try #require(
+			SampleErrorModel.decodeFromData(
+				data: Data(jsonString.utf8),
+				withDateDecodingStrategy: .millisecondsSince1970
+			)
+		)
 		
-		XCTAssertNotNil(decodedData, "error should not be nil")
-		XCTAssertEqual(decodedData?.error, expectedMessageValue, "message should be equal to expected")
-		XCTAssertNotNil(decodedData?.code)
-		XCTAssertEqual(decodedData?.code, expectedCode, "code should be equal to expected")
-		
-		XCTAssertEqual(decodedData?.date?.timeIntervalSince1970, 1575981667984 / 1000, "code should be equal to expected")
+		#expect(decodedData.error == expectedMessageValue)
+		#expect(decodedData.code == expectedCode)
+		#expect(decodedData.date?.timeIntervalSince1970 == 1_575_981_667.984)
 	}
 
-	func testDecode_invalidJSON() {
-		let errorData = "\"message\":\"error message text\"}"
-		let decodedData = SampleErrorModel.decodeFromData(data: errorData.data(using: .utf8)!)
+	@Test("Returns nil for malformed JSON")
+	func decodeInvalidJSON() {
+		let errorData = Data(#""message":"error message text"}"#.utf8)
+		let decodedData = SampleErrorModel.decodeFromData(data: errorData)
 		
-		XCTAssertNil(decodedData)
+		#expect(decodedData == nil)
 	}
 	
-	func testEncode() {
-		let expectedDate = Date(timeIntervalSince1970: TimeInterval(1575981667.984))
-		let exmectedMessage = "error message text"
+	@Test("Round-trips encoded data with a custom date strategy")
+	func encode() throws {
+		let expectedDate = Date(timeIntervalSince1970: 1_575_981_667.984)
+		let expectedMessage = "error message text"
 		
 		let error = SampleErrorModel(
-			error: exmectedMessage,
+			error: expectedMessage,
 			code: 404,
 			date: expectedDate
 		)
-		let encodedData = SampleErrorModel.encode(fromEncodable: error, withDateEncodingStrategy: .millisecondsSince1970)
+		let encodedData = try #require(
+			SampleErrorModel.encode(
+				fromEncodable: error,
+				withDateEncodingStrategy: .millisecondsSince1970
+			)
+		)
+		let decodedModel = try #require(
+			SampleErrorModel.decodeFromData(
+				data: encodedData,
+				withDateDecodingStrategy: .millisecondsSince1970
+			)
+		)
 		
-		XCTAssertNotNil(encodedData, "data should not be nil")
+		#expect(decodedModel.date == expectedDate)
+		#expect(decodedModel.error == expectedMessage)
+		#expect(decodedModel.code == 404)
+	}
+
+	@Test("Uses seconds since 1970 by default when decoding")
+	func decodeUsesDefaultDateStrategy() throws {
+		let jsonString = #"{"error":"default strategy","date":1575981667.984}"#
+		let decodedData = try #require(SampleErrorModel.decodeFromData(data: Data(jsonString.utf8)))
 		
-		let decodedModel = SampleErrorModel.decodeFromData(data: encodedData!, withDateDecodingStrategy: .millisecondsSince1970)
+		#expect(decodedData.error == "default strategy")
+		#expect(decodedData.date == Date(timeIntervalSince1970: 1_575_981_667.984))
+	}
+
+	@Test("Uses seconds since 1970 by default when encoding")
+	func encodeUsesDefaultDateStrategy() throws {
+		let model = SampleErrorModel(
+			error: "default strategy",
+			code: 200,
+			date: Date(timeIntervalSince1970: 1_575_981_667.984)
+		)
+		let encodedData = try #require(SampleErrorModel.encode(fromEncodable: model))
+		let jsonObject = try #require(
+			JSONSerialization.jsonObject(with: encodedData) as? [String: Any]
+		)
+
+		#expect(jsonObject["error"] as? String == "default strategy")
+		#expect(jsonObject["code"] as? Int == 200)
+		#expect(jsonObject["date"] as? Double == 1_575_981_667.984)
+	}
+
+	@Test("Returns nil when model decoding throws")
+	func decodeReturnsNilWhenModelDecodingFails() {
+		let decodedData = FailingDecodableModel.decodeFromData(data: Data("{}".utf8))
 		
+		#expect(decodedData == nil)
+	}
+
+	@Test("Returns nil when model encoding throws")
+	func encodeReturnsNilWhenModelEncodingFails() {
+		let encodedData = FailingEncodableModel.encode(fromEncodable: FailingEncodableModel())
 		
-		XCTAssertEqual(decodedModel!.date, expectedDate, "Dates should be equal")
-		XCTAssertEqual(decodedModel!.error, exmectedMessage, "Messages should be equal")
-		XCTAssertEqual(decodedModel!.code, 404, "Codes should be equal")
+		#expect(encodedData == nil)
+	}
+}
+
+private enum ParseableTestError: Error {
+	case expectedFailure
+}
+
+private struct FailingDecodableModel: Codable, Parseable {
+	typealias ParseableType = Self
+	
+	init() {}
+	
+	init(from decoder: Decoder) throws {
+		throw ParseableTestError.expectedFailure
+	}
+}
+
+private struct FailingEncodableModel: Codable, Parseable {
+	typealias ParseableType = Self
+	
+	init() {}
+	
+	init(from decoder: Decoder) throws {
+		self.init()
+	}
+	
+	func encode(to encoder: Encoder) throws {
+		throw ParseableTestError.expectedFailure
 	}
 }
